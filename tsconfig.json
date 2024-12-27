@@ -1,0 +1,18 @@
+{
+  "extends": "@finsweet/tsconfig",
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "rootDir": ".",
+    "baseUrl": "./",
+    "esModuleInterop": true,
+    "paths": {
+      "$utils/*": ["src/utils/*"],
+      "$api/*": ["src/api/*"],
+      "$modules/*": ["src/modules/*"],
+      "$types/*": ["src/global-types/*"]
+    },
+    "types": ["@finsweet/ts-utils"],
+    "typeRoots": ["./node_modules/@types", "src/global-types"],
+  }
+}
