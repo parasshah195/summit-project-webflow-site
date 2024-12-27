@@ -9,7 +9,7 @@ const PRODUCTION = process.env.NODE_ENV === 'production';
 // Config entrypoint files
 const ENTRY_POINTS = [
   // Frontend JS Initializer
-  'src/index.ts',
+  'src/entry.ts',
 
   // AlpineJS library and Webflow connector
   'src/utils/alpineWebflow.ts',
@@ -40,7 +40,6 @@ const ENTRY_POINTS = [
 
   // Navbar gap processor
   'src/utils/navSpacing.ts',
-  'src/utils/navMobileMenu.ts',
 ];
 
 // Config dev serving
