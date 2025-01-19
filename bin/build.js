@@ -3,8 +3,11 @@ import { readdirSync } from 'fs';
 import { join, sep } from 'path';
 
 // Config output
-const BUILD_DIRECTORY = 'dist';
+const DEV_BUILD_PATH = './dist/dev';
+const PROD_BUILD_PATH = './dist/prod';
 const PRODUCTION = process.env.NODE_ENV === 'production';
+
+const BUILD_DIRECTORY = !PRODUCTION ? DEV_BUILD_PATH : PROD_BUILD_PATH;
 
 // Config entrypoint files
 const ENTRY_POINTS = [

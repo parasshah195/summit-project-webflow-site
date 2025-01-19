@@ -24,5 +24,8 @@ typings/
 # dotenv environment variables file
 .env
 
+# Development files
+dist/dev
+
 # Production files
-# dist
+# dist/prod
