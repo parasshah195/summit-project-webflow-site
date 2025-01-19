@@ -10,7 +10,11 @@ import './dev/script-source';
 globalThis.dayjs = dayjs;
 
 const LOCALHOST_BASE = 'http://localhost:3000/';
-window.PRODUCTION_BASE = 'https://summit-project.com/'; // TODO: change this to the actual domain
+// window.PRODUCTION_BASE = 'https://summit-project.com/'; // TODO: change this to the actual domain
+
+// NOTE: this is a temporary JSDelivr CDN base for the production build
+window.PRODUCTION_BASE =
+  'https://cdn.jsdelivr.net/gh/parasshah195/summit-project-webflow-site/dist/prod/';
 
 window.JS_SCRIPTS = new Set();
 
@@ -44,8 +48,7 @@ function addJS() {
 }
 
 function appendScripts() {
-  const BASE =
-    window.SCRIPTS_ENV === 'local' ? LOCALHOST_BASE : window.PRODUCTION_BASE;
+  const BASE = window.SCRIPTS_ENV === 'local' ? LOCALHOST_BASE : window.PRODUCTION_BASE;
 
   window.JS_SCRIPTS?.forEach((url) => {
     const script = document.createElement('script');
