@@ -37,14 +37,20 @@ abstract class QueryAPI {
    * @returns
    */
   public async sendQuery(): Promise<BaseAPIResponse | null> {
-    const response = await fetch(this.API_BASE + this.API_ENDPOINT, {
-      method: 'post',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(this.API_BODY),
-    });
+    let response: Response;
+    try {
+      response = await fetch(this.API_BASE + this.API_ENDPOINT, {
+        method: 'post',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(this.API_BODY),
+      });
+    } catch (error) {
+      console.error(`Error when sending query: ${this.API_BASE}${this.API_ENDPOINT}`, error);
+      return null;
+    }
 
     if (!response.ok) {
       console.warn(`Error when sending query: ${this.API_BASE}${this.API_ENDPOINT}`);
