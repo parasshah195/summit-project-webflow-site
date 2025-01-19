@@ -1,0 +1,47 @@
+name: Purge JSDelivr Cache
+
+on:
+  workflow_run:
+    workflows: ['Increment Semver Tag']
+    types: ['completed']
+    branches:
+      - main
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Purge JSDelivr Cache
+        run: |
+          echo "Purging jsDelivr cache for all files under dist..."
+          PURGE_URL="https://purge.jsdelivr.net/gh/${{ github.repository }}@latest/dist/"
+          echo "Sending purge request to: $PURGE_URL"
+
+          # Perform curl request with GET method and capture output and status code
+          HTTP_RESPONSE=$(curl -s -o response.txt -w "%{http_code}" "$PURGE_URL")
+
+          # Print the response body and status code
+          echo "Response body:"
+          cat response.txt
+          echo ""
+          echo "HTTP status code: $HTTP_RESPONSE"
+
+          # Parse the JSON response
+          PURGE_STATUS=$(jq -r '.status' response.txt)
+          PURGE_ID=$(jq -r '.id' response.txt)
+          THROTTLED=$(jq -r '.paths["/gh/${{ github.repository }}@latest/dist/"].throttled' response.txt)
+          THROTTLING_RESET=$(jq -r '.paths["/gh/${{ github.repository }}@latest/dist/"].throttlingReset // 0' response.txt)
+
+          # Check if the request was successful
+          if [ $HTTP_RESPONSE -eq 200 ] && [ "$PURGE_STATUS" = "finished" ]; then
+            if [ "$THROTTLED" = "true" ]; then
+              echo "Error: Cache purge request was throttled. Throttling reset in $THROTTLING_RESET seconds. Purge ID: $PURGE_ID"
+              echo "The cache was not purged successfully due to throttling. Try manual purging at https://www.jsdelivr.com/tools/purge"
+              exit 1
+            else
+              echo "Cache purge request sent successfully. Purge ID: $PURGE_ID"
+            fi
+          else
+            echo "Error: Cache purge request failed. Status code: $HTTP_RESPONSE, Purge status: $PURGE_STATUS"
+            exit 1
+          fi
