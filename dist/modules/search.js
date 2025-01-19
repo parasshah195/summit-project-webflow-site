@@ -1,0 +1,1 @@
+"use strict";(()=>{function e(t){return new URLSearchParams(window.location.search).get(t)||""}var r="search";var a="query";document.addEventListener("alpine:init",()=>{window.Alpine.store(r,{query:e(a)})});})();
