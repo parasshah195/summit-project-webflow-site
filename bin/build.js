@@ -33,10 +33,6 @@ const ENTRY_POINTS = [
   'src/modules/filter-events-online.ts',
   'src/modules/filter-events-locations.ts',
 
-  // Pricing pages (`../buy`)
-  'src/modules/pricing.ts',
-  'src/api/affirmEMI.js',
-
   // Navbar gap processor
   'src/utils/navSpacing.ts',
 ];

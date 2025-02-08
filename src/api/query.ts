@@ -2,13 +2,9 @@ import type {
   APIResponseData as EventsAPIResponseData,
   EmptyResponseData as EventsEmptyResponseData,
 } from './eventQueryTypes';
-import type {
-  APIResponseData as PricingAPIResponseData,
-  EmptyResponseData as PricingEmptyResponseData,
-} from './pricingQueryTypes';
 
-type BaseAPIResponse = EventsAPIResponseData | PricingAPIResponseData;
-type BaseEmptyAPIResponse = EventsEmptyResponseData | PricingEmptyResponseData | null;
+type BaseAPIResponse = EventsAPIResponseData;
+type BaseEmptyAPIResponse = EventsEmptyResponseData | null;
 
 /**
  * Base class for querying Applerouth APIs
