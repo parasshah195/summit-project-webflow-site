@@ -24,8 +24,7 @@ import {
 } from '$utils/getDateTime';
 import isMultiDayEvent from '$utils/isMultiDayEvent';
 import { setEventQueryFromAttr } from '$utils/setEventQueryFromAttr';
-import { setGeoStoreWatcher } from '$utils/setGeoStoreWatcher';
-import { FILTER_STORE_NAME, GEOLOCATION_STORE_NAME } from '$utils/storeNames';
+import { FILTER_STORE_NAME } from '$utils/storeNames';
 
 /**
  * Individual location structure
@@ -115,7 +114,6 @@ window.addEventListener('alpine:init', () => {
 
       apiBody: {
         category: ['practice_test'],
-        market: window.Alpine.store(GEOLOCATION_STORE_NAME).market_id,
         start: 0,
         limit: 30,
         is_online: false,
@@ -170,11 +168,6 @@ window.addEventListener('alpine:init', () => {
             });
           })
         );
-
-        setGeoStoreWatcher(this, () => {
-          this.setAPIQueryFilters();
-          this.processQuery();
-        });
       },
 
       destroy() {

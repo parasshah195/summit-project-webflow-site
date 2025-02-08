@@ -21,8 +21,8 @@
 
 import { restartWebflow } from '@finsweet/ts-utils';
 
-import type { APIResponse as EventAPIResponse } from '$api/eventQueryTypes';
 import PricingQuery from '$api/pricingQuery';
+import type { APIResponse as EventAPIResponse } from '$api/eventQueryTypes';
 import type {
   GradeTypes,
   LevelTypes,
@@ -39,8 +39,6 @@ import {
   removeAllQueryParams,
   setQueryParam,
 } from '$utils/queryParamOps';
-import { setGeoStoreWatcher } from '$utils/setGeoStoreWatcher';
-import { GEOLOCATION_STORE_NAME } from '$utils/storeNames';
 
 interface TutoringBuyLink extends URL {
   searchParams: TutoringBuyLinkParams;
@@ -256,7 +254,6 @@ window.addEventListener('alpine:init', () => {
 
         rates: [],
         apiBody: {
-          market_id: window.Alpine.store(GEOLOCATION_STORE_NAME).market_id,
           minimum_quantity: 0,
         },
 
@@ -316,25 +313,6 @@ window.addEventListener('alpine:init', () => {
                 this.updatePriceFromAPI();
               }
             })
-          );
-
-          // Geolocation watcher
-          setGeoStoreWatcher(
-            this,
-            (newMarketVal: number) => {
-              this.apiBody.market_id = newMarketVal;
-
-              if (this.isTestPrepPrivateTutoring() || this.isAcademicTutoring()) {
-                this.resetParams();
-              }
-
-              this.getRates();
-
-              if (this.isTestPrepGroupClass()) {
-                this.clearGroupClass();
-              }
-            },
-            { autoUpdateMarket: false }
           );
         },
 
@@ -542,7 +520,6 @@ window.addEventListener('alpine:init', () => {
           this.checkoutLink = this.getNewCheckoutURL();
 
           const subject = this.subject || 1;
-          const market = this.apiBody.market_id;
 
           if (
             this.isTestPrepPrivateTutoring() ||
@@ -553,7 +530,6 @@ window.addEventListener('alpine:init', () => {
             const mode = this.mode.id || DEFAULT_MODE_ID;
             this.checkoutLink.searchParams.set('hours', this.hours.toString());
             this.checkoutLink.searchParams.set('subject_id', subject.toString());
-            this.checkoutLink.searchParams.set('market_id', market.toString());
             this.checkoutLink.searchParams.set('instructor_level_id', level.toString());
             this.checkoutLink.searchParams.set('instruction_mode_id', mode.toString());
             this.checkoutLink.searchParams.set('fee_product_id', DEFAULT_ENROLMENT_FEE_PRODUCT_ID);

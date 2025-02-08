@@ -5,24 +5,12 @@ import type {
   EmptyResponseData as EventsEmptyResponseData,
 } from './eventQueryTypes';
 import type {
-  APIResponseData as GeolocationAPIResponseData,
-  EmptyResponseData as GeolocationEmptyResponseData,
-} from './geolocationQueryTypes';
-import type {
   APIResponseData as PricingAPIResponseData,
   EmptyResponseData as PricingEmptyResponseData,
 } from './pricingQueryTypes';
 
-type BaseAPIResponse =
-  | EventsAPIResponseData
-  | GeolocationAPIResponseData
-  | PricingAPIResponseData
-  | NPTResponseData;
-type BaseEmptyAPIResponse =
-  | EventsEmptyResponseData
-  | GeolocationEmptyResponseData
-  | PricingEmptyResponseData
-  | null;
+type BaseAPIResponse = EventsAPIResponseData | PricingAPIResponseData | NPTResponseData;
+type BaseEmptyAPIResponse = EventsEmptyResponseData | PricingEmptyResponseData | null;
 
 /**
  * Base class for querying Applerouth APIs

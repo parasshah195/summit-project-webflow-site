@@ -31,7 +31,7 @@ export type QueryParams = {
   /**
    * Market for which to query the rates
    */
-  market_id: number;
+  market_id?: number;
   /**
    * Subject ID for which to query the rates
    */
