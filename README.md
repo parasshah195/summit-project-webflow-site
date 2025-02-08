@@ -73,7 +73,7 @@ To start development mode, run `pnpm dev`. Two things happen:
 You can add them in your Webflow pages like:
 
 ```javascript
-	window.JS_SCRIPTS.add('modules/geolocation.js');
+	window.JS_SCRIPTS.add('modules/event-list.js');
 ```
 
 *If a script is global, add it in the project settings, else in the page settings.*

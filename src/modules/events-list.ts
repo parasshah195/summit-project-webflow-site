@@ -81,7 +81,7 @@ interface EventsListComponent {
   isQueryError: boolean;
   /**
    * Auto-runs on component initialization
-   * Sets the API parameters, initializes the query, and watches Geolocation store changes
+   * Sets the API parameters, and initializes the query
    */
   init(): void;
   /**

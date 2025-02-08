@@ -1,5 +1,3 @@
-import type { ResponseStructure as NPTResponseData } from 'src/pages/national-practice-test/events-form-query';
-
 import type {
   APIResponseData as EventsAPIResponseData,
   EmptyResponseData as EventsEmptyResponseData,
@@ -9,7 +7,7 @@ import type {
   EmptyResponseData as PricingEmptyResponseData,
 } from './pricingQueryTypes';
 
-type BaseAPIResponse = EventsAPIResponseData | PricingAPIResponseData | NPTResponseData;
+type BaseAPIResponse = EventsAPIResponseData | PricingAPIResponseData;
 type BaseEmptyAPIResponse = EventsEmptyResponseData | PricingEmptyResponseData | null;
 
 /**

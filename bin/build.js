@@ -17,10 +17,6 @@ const ENTRY_POINTS = [
   // AlpineJS library and Webflow connector
   'src/utils/alpineWebflow.ts',
 
-  // Global geolocation
-  'src/modules/geolocation.ts',
-  'src/modules/geolocation-zip.ts',
-
   // Events List Generic Component
   'src/modules/events-list.ts',
 

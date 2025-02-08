@@ -4,11 +4,9 @@ import type { NPTEventsAlpineStore } from 'src/pages/national-practice-test/even
 import type { PSATEventsAlpineStore } from 'src/pages/national-practice-test/events';
 
 import type { FilterAlpineStore } from '$modules/filter-store';
-import type { GeolocationAlpineStore } from '$modules/geolocation';
 import type { SearchAlpineStore } from '$modules/search';
 import type {
   FILTER_STORE_NAME,
-  GEOLOCATION_STORE_NAME,
   NPT_EVENTS_STORE_NAME,
   NPT_STRATEGY_SESSIONS_STORE_NAME,
   PSAT_PATHWAYS_EVENTS_STORE_NAME,
@@ -31,7 +29,6 @@ interface XDataContext {
  * Define all custom stores
  */
 export interface AlpineStoreExtensions {
-  [GEOLOCATION_STORE_NAME]: GeolocationAlpineStore;
   [FILTER_STORE_NAME]: FilterAlpineStore;
   [SEARCH_STORE_NAME]: SearchAlpineStore;
   [NPT_EVENTS_STORE_NAME]: NPTEventsAlpineStore;
