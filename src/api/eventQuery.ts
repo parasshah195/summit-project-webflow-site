@@ -30,6 +30,10 @@ export class EventQuery extends QueryAPI {
     if (!this.API_BODY.start) {
       this.API_BODY.start = 0;
     }
+
+    // if (!this.API_BODY.market) {
+    //   this.API_BODY.market = 2;
+    // }
   }
 
   /**
