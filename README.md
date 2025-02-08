@@ -1,6 +1,6 @@
 # Summit Marketing Website
 
-This project contains the JavaScript for the Summit website. It powers all the dynamic geolocation and API-driven content modules. The front-end reactivity is built using [AlpineJS](https://alpinejs.dev/), with the help of [AlpineJS-Webflow connector lib](https://github.com/loomchild/webflow-alpinejs).
+This project contains the JavaScript for the Summit website. It powers all the API-driven content modules. The front-end reactivity is built using [AlpineJS](https://alpinejs.dev/), with the help of [AlpineJS-Webflow connector lib](https://github.com/loomchild/webflow-alpinejs).
 
 ## Reference
 
