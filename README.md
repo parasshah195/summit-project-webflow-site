@@ -1,6 +1,6 @@
 # Summit Marketing Website
 
-This project contains the JavaScript for the Summit website. It powers all the dynamic geolocation and API-driven content modules. The front-end reactivity is built using [AlpineJS](https://alpinejs.dev/), with the help of [AlpineJS-Webflow connector lib](https://github.com/loomchild/webflow-alpinejs).
+This project contains the JavaScript for the Summit website. It powers all the API-driven content modules. The front-end reactivity is built using [AlpineJS](https://alpinejs.dev/), with the help of [AlpineJS-Webflow connector lib](https://github.com/loomchild/webflow-alpinejs).
 
 ## Reference
 
@@ -73,7 +73,7 @@ To start development mode, run `pnpm dev`. Two things happen:
 You can add them in your Webflow pages like:
 
 ```javascript
-	window.JS_SCRIPTS.add('modules/geolocation.js');
+	window.JS_SCRIPTS.add('modules/event-list.js');
 ```
 
 *If a script is global, add it in the project settings, else in the page settings.*

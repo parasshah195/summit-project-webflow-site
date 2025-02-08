@@ -14,9 +14,6 @@
  *  1. `x-ref`to the blog post collection list with the value `blogTagsList`
  *  2. `tag_name` to the image in the collection item with the dynamic value of the Blog's Tag
  *
- * To disable the Geolocation store watcher, add attribute:
- * - the value of the `GEO_STORE_UNWATCH_ATTRIBUTE` property in this class to the `componentEl` element
- *
  * To use on non-slider elements, add attribute:
  * - the value of the `NON_SLIDER_ATTRIBUTE` property in this class to the `componentEl` element
  */
@@ -28,8 +25,6 @@ import { getEventDateRange, getTimeRange } from '$utils/getDateTime';
 import isMultiDayEvent from '$utils/isMultiDayEvent';
 import { reInitSliders } from '$utils/reinitSliders';
 import { setEventQueryFromAttr } from '$utils/setEventQueryFromAttr';
-import { setGeoStoreWatcher } from '$utils/setGeoStoreWatcher';
-import { GEOLOCATION_STORE_NAME } from '$utils/storeNames';
 
 interface APIResponseWithImage extends APIResponse {
   image_src: string | null;
@@ -86,7 +81,7 @@ interface EventsListComponent {
   isQueryError: boolean;
   /**
    * Auto-runs on component initialization
-   * Sets the API parameters, initializes the query, and watches Geolocation store changes
+   * Sets the API parameters, and initializes the query
    */
   init(): void;
   /**
@@ -122,11 +117,6 @@ window.addEventListener('alpine:init', () => {
   // TODO: this variable is already defined in `eventQuery`. Don't repeat
   const DEFAULT_EVENTS_LIMIT = 12;
   /**
-   * Attribute to disable the Geolocation store watcher
-   * To be set on the `componentEl` reference
-   */
-  const GEO_STORE_UNWATCH_ATTRIBUTE = 'data-unwatch-geostore';
-  /**
    * Declares if the current events component is not a slider
    * Primarily used for table list
    */
@@ -135,7 +125,6 @@ window.addEventListener('alpine:init', () => {
   window.Alpine.data('eventsList', function () {
     const API_BODY: QueryParams = {
       category: ['marketing_event'],
-      market: window.Alpine.store(GEOLOCATION_STORE_NAME).market_id,
       start: 0,
       limit: DEFAULT_EVENTS_LIMIT,
       name: undefined,
@@ -210,19 +199,6 @@ window.addEventListener('alpine:init', () => {
 
         this.setAPIParams();
         this.processQuery();
-
-        if (!this.$refs?.componentEl.hasAttribute(GEO_STORE_UNWATCH_ATTRIBUTE)) {
-          setGeoStoreWatcher(this, () => {
-            // reset events
-            this.events = [];
-            // reset apiBody to defaults
-            this.apiBody = API_BODY;
-            // set API params from query attributes
-            this.setAPIParams();
-            // process query on geolocation change
-            this.processQuery();
-          });
-        }
       },
 
       setAPIParams() {

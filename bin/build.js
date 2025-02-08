@@ -17,10 +17,6 @@ const ENTRY_POINTS = [
   // AlpineJS library and Webflow connector
   'src/utils/alpineWebflow.ts',
 
-  // Global geolocation
-  'src/modules/geolocation.ts',
-  'src/modules/geolocation-zip.ts',
-
   // Events List Generic Component
   'src/modules/events-list.ts',
 
@@ -36,10 +32,6 @@ const ENTRY_POINTS = [
   'src/modules/filter-form.ts',
   'src/modules/filter-events-online.ts',
   'src/modules/filter-events-locations.ts',
-
-  // Pricing pages (`../buy`)
-  'src/modules/pricing.ts',
-  'src/api/affirmEMI.js',
 
   // Navbar gap processor
   'src/utils/navSpacing.ts',

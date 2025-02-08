@@ -22,7 +22,7 @@ export type DaysOfWeek = 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun';
  * Defined as a type instead of interface to allow type-check mapping from the QueryAPI class
  */
 export type QueryParams = {
-  category: Array<QueryParamsCategories>; // The “all” option would query by all categories
+  category: Array<QueryParamsCategories>; // The "all" option would query by all categories
   /**
    * The id of the market
    */
@@ -36,7 +36,7 @@ export type QueryParams = {
    */
   name?: string;
   /**
-   * Event code. E.g: “EVT83DD6”
+   * Event code. E.g: "EVT83DD6"
    */
   event_code?: string | string[];
   /**
@@ -72,7 +72,7 @@ export type QueryParams = {
    */
   timezone?: string;
   /**
-   * The “prepare for test date” date
+   * The "prepare for test date" date
    */
   test_date?: Date;
   /**
@@ -82,7 +82,7 @@ export type QueryParams = {
   is_online?: boolean;
   extended_time_available?: boolean;
   /**
-   * 3 letter day name Eg: [“Mon”, “Tue”]
+   * 3 letter day name Eg: ["Mon", "Tue"]
    */
   days_of_week?: Array<string>;
   location_id?: number;
@@ -122,7 +122,7 @@ export interface APIResponse {
   event_code: string;
   is_online: boolean;
   /**
-   * The “prepare for test date” date
+   * The "prepare for test date" date
    */
   test_date?: Date | null;
   /**
@@ -174,7 +174,7 @@ export interface APIResponse {
   topics: Array<string>;
   /**
    * Days on which the event is available.
-   * 3 letter weekday name. E.g: [“Mon”, “Tue”]
+   * 3 letter weekday name. E.g: ["Mon", "Tue"]
    */
   days_of_week: Array<DaysOfWeek>;
   address: string | null;

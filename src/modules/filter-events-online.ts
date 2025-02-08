@@ -16,8 +16,7 @@ import {
 } from '$utils/getDateTime';
 import isMultiDayEvent from '$utils/isMultiDayEvent';
 import { setEventQueryFromAttr } from '$utils/setEventQueryFromAttr';
-import { setGeoStoreWatcher } from '$utils/setGeoStoreWatcher';
-import { FILTER_STORE_NAME, GEOLOCATION_STORE_NAME } from '$utils/storeNames';
+import { FILTER_STORE_NAME } from '$utils/storeNames';
 
 import type { FilterAlpineStore } from './filter-store';
 
@@ -88,7 +87,7 @@ window.addEventListener('alpine:init', () => {
     /**
      * Array of Alpine effects to released on destroy
      */
-    const effectWatchers = [];
+    const effectWatchers: Array<ReturnType<typeof window.Alpine.effect>> = [];
 
     return {
       isLoading: false,
@@ -102,7 +101,6 @@ window.addEventListener('alpine:init', () => {
 
       apiBody: {
         category: ['practice_test'],
-        market: window.Alpine.store(GEOLOCATION_STORE_NAME).market_id,
         start: 0,
         limit: 6,
         is_online: true,
@@ -132,11 +130,6 @@ window.addEventListener('alpine:init', () => {
             });
           })
         );
-
-        setGeoStoreWatcher(this, () => {
-          this.setAPIQueryFilters();
-          this.processQuery();
-        });
       },
 
       destroy() {
@@ -239,7 +232,7 @@ window.addEventListener('alpine:init', () => {
   });
 
   window.Alpine.data('filterEventsOnlineOnDemand', function () {
-    const effectWatchers = [];
+    const effectWatchers: Array<ReturnType<typeof window.Alpine.effect>> = [];
     let defaultRowDisplayValue = 'grid';
 
     return {
@@ -251,10 +244,12 @@ window.addEventListener('alpine:init', () => {
       async init() {
         await this.$nextTick();
 
-        this.eventRowsElList =
-          this.$refs.eventsListEl?.querySelectorAll<HTMLElement>('[data-event-row]');
-        this.eventNamesElList =
-          this.$refs.eventsListEl?.querySelectorAll<HTMLElement>('[data-event-name]');
+        this.eventRowsElList = this.$refs.eventsListEl?.querySelectorAll('[data-event-row]') as
+          | NodeListOf<HTMLElement>
+          | undefined;
+        this.eventNamesElList = this.$refs.eventsListEl?.querySelectorAll('[data-event-name]') as
+          | NodeListOf<HTMLElement>
+          | undefined;
 
         if (this.eventRowsElList) {
           defaultRowDisplayValue = this.eventRowsElList[0].style.display;
@@ -289,7 +284,9 @@ window.addEventListener('alpine:init', () => {
 
         this.eventNamesElList?.forEach((eventNameEl: HTMLElement, index: number) => {
           if (!eventNameEl.innerText.match(filterNameWordMatchRegex)) {
-            this.eventRowsElList[index].style.display = 'none';
+            if (this.eventRowsElList) {
+              this.eventRowsElList[index].style.display = 'none';
+            }
           } else {
             this.filterEventCount += 1;
           }

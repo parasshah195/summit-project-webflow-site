@@ -1,28 +1,10 @@
-import type { ResponseStructure as NPTResponseData } from 'src/pages/national-practice-test/events-form-query';
-
 import type {
   APIResponseData as EventsAPIResponseData,
   EmptyResponseData as EventsEmptyResponseData,
 } from './eventQueryTypes';
-import type {
-  APIResponseData as GeolocationAPIResponseData,
-  EmptyResponseData as GeolocationEmptyResponseData,
-} from './geolocationQueryTypes';
-import type {
-  APIResponseData as PricingAPIResponseData,
-  EmptyResponseData as PricingEmptyResponseData,
-} from './pricingQueryTypes';
 
-type BaseAPIResponse =
-  | EventsAPIResponseData
-  | GeolocationAPIResponseData
-  | PricingAPIResponseData
-  | NPTResponseData;
-type BaseEmptyAPIResponse =
-  | EventsEmptyResponseData
-  | GeolocationEmptyResponseData
-  | PricingEmptyResponseData
-  | null;
+type BaseAPIResponse = EventsAPIResponseData;
+type BaseEmptyAPIResponse = EventsEmptyResponseData | null;
 
 /**
  * Base class for querying Applerouth APIs
