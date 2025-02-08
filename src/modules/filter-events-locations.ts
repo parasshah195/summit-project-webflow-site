@@ -7,6 +7,9 @@
  * Location sorting order is picked up by the order of elements in the Webflow CMS output.
  * For location specific events loading, the further query is done by supplying the `location_id` parameter.
  *
+ * Multiple locations can be specified using the `locations` attribute on the component element as an array of location IDs.
+ * If specified, the component will query each location separately and combine the results.
+ *
  * Location images are also fetched from the Webflow CMS collection tagged as x-ref `locationList`
  *
  * Component name - `filterEventsLocations`
@@ -52,6 +55,10 @@ interface FilterEventsLocationsComponent {
    */
   apiBody: QueryParams;
   /**
+   * Array of location IDs to query, set from the locations attribute
+   */
+  locationIds: number[];
+  /**
    * Dynamic loop key for events within a given location
    */
   filterLocationItemAttr: { ':key'(): number };
@@ -68,6 +75,10 @@ interface FilterEventsLocationsComponent {
    */
   setAPIQueryFilters(): void;
   processQuery(): Promise<void>;
+  /**
+   * Query events for a specific location
+   */
+  queryLocationEvents(locationId?: number): Promise<APIResponse[]>;
   /**
    * Populates more events for given locations when not enough are assigned
    */
@@ -109,7 +120,7 @@ window.addEventListener('alpine:init', () => {
       isLoading: false,
       isQueryError: false,
       areEventsAvailable: true,
-
+      locationIds: [],
       locations: [],
 
       apiBody: {
@@ -158,6 +169,19 @@ window.addEventListener('alpine:init', () => {
 
         setEventQueryFromAttr(this.$refs.componentEl, this);
 
+        // Get locations array from attribute
+        const locationsAttr = this.$refs.componentEl.getAttribute('locations');
+        if (locationsAttr) {
+          try {
+            const parsedLocations = JSON.parse(locationsAttr.replace(/'/g, '"'));
+            this.locationIds = Array.isArray(parsedLocations)
+              ? parsedLocations.map(Number)
+              : [Number(parsedLocations)];
+          } catch (err) {
+            console.warn('Failed to parse locations attribute:', err);
+          }
+        }
+
         effectWatchers.push(
           window.Alpine.effect(() => {
             this.setAPIQueryFilters();
@@ -187,31 +211,77 @@ window.addEventListener('alpine:init', () => {
         this.apiBody.days_of_week = filterStore.days_of_week;
       },
 
+      async queryLocationEvents(locationId?: number): Promise<APIResponse[]> {
+        const queryBody = { ...this.apiBody };
+        if (locationId !== undefined) {
+          queryBody.location_id = locationId;
+        }
+        const eventsData = await new EventQuery(queryBody).getQueryData();
+        return eventsData || [];
+      },
+
       async processQuery(): Promise<void> {
         this.areEventsAvailable = true;
         this.isLoading = true;
         this.isQueryError = false;
         this.locations = [];
 
-        const eventsData = (await new EventQuery(this.apiBody).getQueryData()) as
-          | APIResponse[]
-          | []
-          | null;
+        try {
+          // If we have specific locations to query, use those
+          const locationsToQuery =
+            this.locationIds.length > 0
+              ? this.locationIds
+              : this.apiBody.location_id
+                ? [this.apiBody.location_id]
+                : [];
 
-        this.isLoading = false;
+          // If no locations specified, do a single query without location_id
+          if (locationsToQuery.length === 0) {
+            const eventsData = await this.queryLocationEvents();
+            if (!eventsData || eventsData.length === 0) {
+              this.areEventsAvailable = false;
+              return;
+            }
+            this.processEventsIntoLocations(eventsData);
+            return;
+          }
 
-        if (!eventsData) {
+          // Query each location separately
+          const allEventsData: APIResponse[] = [];
+          let hasAnyResults = false;
+          let allQueriesFailed = true;
+
+          for (const locationId of locationsToQuery) {
+            try {
+              const locationEvents = await this.queryLocationEvents(locationId);
+              if (locationEvents && locationEvents.length > 0) {
+                hasAnyResults = true;
+                allEventsData.push(...locationEvents);
+              }
+              allQueriesFailed = false;
+            } catch (err) {
+              console.warn(`Failed to fetch events for location ${locationId}:`, err);
+            }
+          }
+
+          this.isQueryError = allQueriesFailed;
+          if (!hasAnyResults) {
+            this.areEventsAvailable = false;
+            return;
+          }
+
+          this.processEventsIntoLocations(allEventsData);
+        } catch (err) {
+          console.error('Error processing query:', err);
           this.isQueryError = true;
-          return;
+        } finally {
+          this.isLoading = false;
         }
+      },
 
-        if (!eventsData.length) {
-          this.areEventsAvailable = false;
-          return;
-        }
-
+      processEventsIntoLocations(eventsData: APIResponse[]): void {
         // Group events by location
-        const locations: FilterEventsLocation[] = (eventsData as APIResponse[]).reduce(
+        const locations: FilterEventsLocation[] = eventsData.reduce(
           (locationsList: FilterEventsLocation[], event: APIResponse) => {
             // skip events that don't have a location ID
             if (!event.location_id) {
@@ -224,8 +294,6 @@ window.addEventListener('alpine:init', () => {
             if (existingLocation) {
               if (existingLocation.events.length < EVENT_LIMIT_PER_LOCATION) {
                 existingLocation.events.push(event);
-              } else {
-                return locationsList;
               }
             } else {
               locationsList.push({
@@ -240,7 +308,7 @@ window.addEventListener('alpine:init', () => {
             }
             return locationsList;
           },
-          this.locations
+          []
         );
 
         // Sort locations by the order defined in the CMS items
@@ -265,7 +333,6 @@ window.addEventListener('alpine:init', () => {
         }
 
         this.locations = locations;
-
         this.fillInitEvents();
       },
 
