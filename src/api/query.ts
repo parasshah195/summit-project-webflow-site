@@ -10,7 +10,7 @@ type BaseEmptyAPIResponse = EventsEmptyResponseData | null;
  * Base class for querying Applerouth APIs
  */
 abstract class QueryAPI {
-  API_BASE = 'https://applerouth.onecanoe.com/api/public/v2';
+  API_BASE = 'https://summit.onecanoe.com/api/public/v2';
   API_ENDPOINT?: string;
   abstract API_BODY?: Record<string, unknown>;
 
