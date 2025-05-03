@@ -18,6 +18,7 @@
 import EventQuery from '$api/eventQuery';
 import type { APIResponse, QueryParams } from '$api/eventQueryTypes';
 import type { ApplerouthAlpineComponent } from '$types/alpine-component';
+import { filterExcludedTopics } from '$utils/filterExcludedTopics';
 import {
   getDays,
   getEventDateRange,
@@ -40,6 +41,7 @@ interface FilterEventsLocation {
   events: APIResponse[]; // list of events in the location
   moreEventsLoading: boolean; // loading state for the events in the location
   eventsDepleted: boolean; // tracking whether we have any more events to show or not
+  nextStart: number; // next start number for the events in the location
 }
 
 interface FilterEventsLocationsComponent {
@@ -50,6 +52,7 @@ interface FilterEventsLocationsComponent {
   isLoading: boolean;
   areEventsAvailable: boolean;
   isQueryError: boolean;
+  componentEl: HTMLElement | null;
   /**
    * API body to be sent to the server for locations query
    */
@@ -164,13 +167,17 @@ window.addEventListener('alpine:init', () => {
         ['sizes']: '',
       },
 
+      componentEl: null,
+
       async init(): Promise<void> {
         await this.$nextTick();
 
-        setEventQueryFromAttr(this.$refs.componentEl, this);
+        this.componentEl = this.$refs.componentEl;
+
+        setEventQueryFromAttr(this.componentEl as HTMLElement, this);
 
         // Get locations array from attribute
-        const locationsAttr = this.$refs.componentEl.getAttribute('locations');
+        const locationsAttr = this.componentEl?.getAttribute('locations');
         if (locationsAttr) {
           try {
             const parsedLocations = JSON.parse(locationsAttr.replace(/'/g, '"'));
@@ -216,8 +223,13 @@ window.addEventListener('alpine:init', () => {
         if (locationId !== undefined) {
           queryBody.location_id = locationId;
         }
-        const eventsData = await new EventQuery(queryBody).getQueryData();
-        return eventsData || [];
+        const eventsData = (await new EventQuery(queryBody).getQueryData()) as
+          | APIResponse[]
+          | []
+          | null;
+
+        // return eventsData || [];
+        return filterExcludedTopics(this.componentEl as HTMLElement, eventsData) || [];
       },
 
       async processQuery(): Promise<void> {
@@ -294,6 +306,7 @@ window.addEventListener('alpine:init', () => {
             if (existingLocation) {
               if (existingLocation.events.length < EVENT_LIMIT_PER_LOCATION) {
                 existingLocation.events.push(event);
+                existingLocation.nextStart = existingLocation.events.length;
               }
             } else {
               locationsList.push({
@@ -304,6 +317,7 @@ window.addEventListener('alpine:init', () => {
                 events: [event],
                 eventsDepleted: false,
                 moreEventsLoading: false,
+                nextStart: 1,
               });
             }
             return locationsList;
@@ -395,22 +409,35 @@ window.addEventListener('alpine:init', () => {
         // create new API request body request object
         const API_BODY = { ...this.apiBody };
         API_BODY.location_id = currentLocation.id;
-        API_BODY.start = currentLocation.events.length;
+        API_BODY.start = currentLocation.nextStart;
         API_BODY.limit = loadExtraEvent ? limit + 1 : limit;
 
         currentLocation.moreEventsLoading = true;
 
-        const responseData = (await new EventQuery(API_BODY).getQueryData()) as APIResponse[] | [];
+        let responseData = (await new EventQuery(API_BODY).getQueryData()) as
+          | APIResponse[]
+          | []
+          | null;
 
         currentLocation.moreEventsLoading = false;
 
         if (
+          !responseData ||
           !responseData.length ||
           (limit === EVENT_LIMIT_PER_LOCATION && responseData.length < EVENT_LIMIT_PER_LOCATION) ||
           (loadExtraEvent && responseData.length <= limit)
         ) {
           currentLocation.eventsDepleted = true;
         }
+
+        currentLocation.nextStart = currentLocation.nextStart + (responseData?.length || 0);
+
+        responseData = filterExcludedTopics(this.componentEl as HTMLElement, responseData) || [];
+
+        // filter out events that are already shown
+        responseData = responseData.filter(
+          (event) => !currentLocation.events.some((e) => e.id === event.id)
+        );
 
         if (!responseData.length) {
           return;
