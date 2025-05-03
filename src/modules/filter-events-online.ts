@@ -7,6 +7,7 @@
 import EventQuery from '$api/eventQuery';
 import type { APIResponse, QueryParams } from '$api/eventQueryTypes';
 import type { ApplerouthAlpineComponent } from '$types/alpine-component';
+import { filterExcludedTopics } from '$utils/filterExcludedTopics';
 import {
   getDays,
   getEventDateRange,
@@ -34,6 +35,7 @@ interface EventsScheduledComponent {
   events: APIResponse[];
   moreEventsLoading: boolean;
   eventsDepleted: boolean;
+  componentEl: HTMLElement | null;
   /**
    * Dynamic loop key for event item
    */
@@ -113,11 +115,14 @@ window.addEventListener('alpine:init', () => {
         },
       },
 
+      componentEl: null,
+
       async init(): Promise<void> {
         await this.$nextTick();
 
         // set the query params from the component attributes
-        setEventQueryFromAttr(this.$refs.componentEl, this);
+        this.componentEl = this.$refs.componentEl;
+        setEventQueryFromAttr(this.componentEl as HTMLElement, this);
 
         this.apiBody.limit = BATCH_COUNT;
 
@@ -165,9 +170,10 @@ window.addEventListener('alpine:init', () => {
       async sendQuery(): Promise<void> {
         this.isQueryError = false;
 
-        const eventsData = (await new EventQuery(this.apiBody).getQueryData()) as
+        let eventsData = (await new EventQuery(this.apiBody).getQueryData()) as
           | APIResponse[]
-          | [];
+          | []
+          | null;
 
         if (!eventsData) {
           this.isQueryError = true;
@@ -179,14 +185,25 @@ window.addEventListener('alpine:init', () => {
           return;
         }
 
+        if (eventsData.length < BATCH_COUNT) {
+          this.eventsDepleted = true;
+        }
+
+        eventsData = filterExcludedTopics(this.componentEl as HTMLElement, eventsData);
+
+        // filter out events that are already shown
+        eventsData =
+          eventsData?.filter((event) => !this.events.some((e) => e.id === event.id)) || [];
+
+        if (!eventsData.length) {
+          this.areEventsAvailable = false;
+          return;
+        }
+
         this.events.push(...eventsData);
 
         // wait for events update in DOM
         await this.$nextTick();
-
-        if (eventsData.length < BATCH_COUNT) {
-          this.eventsDepleted = true;
-        }
       },
 
       getGroupedDays() {
@@ -210,11 +227,31 @@ window.addEventListener('alpine:init', () => {
 
         this.apiBody.start += BATCH_COUNT;
 
-        await this.sendQuery();
+        try {
+          let eventsData = (await new EventQuery(this.apiBody).getQueryData()) as
+            | APIResponse[]
+            | []
+            | null;
 
-        this.$nextTick(() => {
-          this.moreEventsLoading = false;
-        });
+          if (!eventsData || eventsData.length < BATCH_COUNT) {
+            this.eventsDepleted = true;
+            return;
+          }
+
+          eventsData = filterExcludedTopics(this.componentEl as HTMLElement, eventsData);
+
+          // filter out events that are already shown
+          eventsData =
+            eventsData?.filter((event) => !this.events.some((e) => e.id === event.id)) || [];
+
+          this.events.push(...eventsData);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          this.$nextTick(() => {
+            this.moreEventsLoading = false;
+          });
+        }
       },
 
       getTimeRange(start, end, includeTimeZone = true) {

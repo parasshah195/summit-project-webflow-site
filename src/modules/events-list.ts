@@ -21,6 +21,7 @@
 import EventQuery from '$api/eventQuery';
 import type { APIResponse, QueryParams } from '$api/eventQueryTypes';
 import type { ApplerouthAlpineComponent } from '$types/alpine-component';
+import { filterExcludedTopics } from '$utils/filterExcludedTopics';
 import { getEventDateRange, getTimeRange } from '$utils/getDateTime';
 import isMultiDayEvent from '$utils/isMultiDayEvent';
 import { reInitSliders } from '$utils/reinitSliders';
@@ -222,7 +223,7 @@ window.addEventListener('alpine:init', () => {
         this.areEventsAvailable = true;
         this.isQueryError = false;
 
-        const eventsData = (await new EventQuery(this.apiBody).getQueryData()) as
+        let eventsData = (await new EventQuery(this.apiBody).getQueryData()) as
           | APIResponse[]
           | []
           | null;
@@ -248,6 +249,12 @@ window.addEventListener('alpine:init', () => {
         ) {
           this.eventsDepleted = true;
         }
+
+        eventsData = filterExcludedTopics(this.$refs.componentEl, eventsData);
+
+        // filter out events that are already shown
+        eventsData =
+          eventsData?.filter((event) => !this.events.some((e) => e.id === event.id)) || [];
 
         eventsData.forEach((event: APIResponse) => {
           if (event.tags && event.tags.length) {

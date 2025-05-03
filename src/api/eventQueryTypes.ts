@@ -56,7 +56,7 @@ export type QueryParams = {
   /**
    * ID of the tests this event belongs to. Eg: [134, 49] ("SAT", "ACT")
    */
-  topics?: Array<number>;
+  topics?: Array<number | string>;
   /**
    * Tests before this date
    */
