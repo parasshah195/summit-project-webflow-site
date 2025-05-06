@@ -15,18 +15,13 @@ export function filterExcludedTopics(
   componentEl: HTMLElement,
   eventsData: APIResponse[] | [] | null
 ) {
-  if (!eventsData || !eventsData.length) {
-    return eventsData;
-  }
+  const excludedTopics = componentEl?.getAttribute(TOPICS_EXCLUSION_ATTR);
 
-  const excludedTopics = componentEl.getAttribute(TOPICS_EXCLUSION_ATTR);
-
-  if (!excludedTopics) {
+  if (!excludedTopics || !eventsData || !eventsData.length) {
     return eventsData;
   }
 
   const excludedTopicsArray = arrayCheck(excludedTopics);
-  console.log(excludedTopicsArray);
 
   // filter out events to remove excluded topics
   eventsData = eventsData.filter((event) => {
