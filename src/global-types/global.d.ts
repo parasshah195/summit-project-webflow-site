@@ -1,9 +1,11 @@
 import { Webflow } from '@finsweet/ts-utils';
+import type jQuery from 'jquery';
 
 export type SCRIPTS_SOURCES = 'local' | 'cdn';
 
 declare global {
   const dayjs: typeof import('dayjs');
+  $: typeof jQuery;
 
   interface Window {
     JS_SCRIPTS?: Set<string>;
@@ -19,23 +21,15 @@ declare global {
 
     isLocal?: boolean;
 
-    loadExternalScript(
-      url: string,
-      placement: 'head' | 'body',
-      defer: boolean
-    ): void;
+    loadExternalScript(url: string, placement: 'head' | 'body', defer: boolean): void;
 
     fsAttributes: any[]; // Finsweet attributes extension
   }
 
   // Extend `querySelector` and `querySelectorAll` function to stop the nagging of converting `Element` to `HTMLElement` all the time
   interface ParentNode {
-    querySelector<E extends HTMLElement = HTMLElement>(
-      selectors: string
-    ): E | null;
-    querySelectorAll<E extends HTMLElement = HTMLElement>(
-      selectors: string
-    ): NodeListOf<E>;
+    querySelector<E extends HTMLElement = HTMLElement>(selectors: string): E | null;
+    querySelectorAll<E extends HTMLElement = HTMLElement>(selectors: string): NodeListOf<E>;
   }
 }
 

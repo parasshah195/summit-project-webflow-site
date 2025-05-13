@@ -85,7 +85,11 @@ function fetchLocalScripts() {
     localhostFetchController.abort();
   }, LOCALHOST_CONNECTION_TIMEOUT_IN_MS);
 
-  fetch(LOCALHOST_BASE, { signal: localhostFetchController.signal })
+  fetch(LOCALHOST_BASE, {
+    method: 'HEAD',
+    mode: 'no-cors',
+    signal: localhostFetchController.signal,
+  })
     .then((response) => {
       if (!response.ok) {
         console.error({ response });
