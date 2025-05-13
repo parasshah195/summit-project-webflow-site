@@ -35,6 +35,9 @@ const ENTRY_POINTS = [
 
   // Navbar gap processor
   'src/utils/navSpacing.ts',
+
+  // Form submit anchor scroll
+  'src/utils/formsparkSubmission.ts',
 ];
 
 // Config dev serving
